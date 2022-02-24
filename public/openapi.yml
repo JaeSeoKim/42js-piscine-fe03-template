@@ -1,0 +1,333 @@
+openapi: 3.0.2
+info:
+  title: 42PAY API
+  description: "**삶, 우주, 그리고 모든 곳**에서 만나는 `42PAY`"
+  version: "1.0"
+paths:
+  /api/login:
+    post:
+      description: 사용자 로그인
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - password
+              properties:
+                id:
+                  type: string
+                password:
+                  type: string
+                  format: password
+
+      responses:
+        "200":
+          description: 로그인 성공!
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - tokken
+                properties:
+                  tokken:
+                    type: string
+        "401":
+          description: 로그인 실패.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "504":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/me:
+    get:
+      description: 사용자 정보 조희
+      responses:
+        "200":
+          description: 사용자 정보 가져오기 성공!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: 권한 없음
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "504":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/me/sync:
+    get:
+      description: 사용자 계좌 동기화
+      responses:
+        "200":
+          description: 사용자 계좌 동기화 요청 성공!
+        "401":
+          description: 권한 없음
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "504":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/me/sync/progress:
+    get:
+      description: 사용자 계좌 동기화 완료 확인 API
+      responses:
+        "200":
+          description: 계좌 동기화 완료 여부
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - "hasFinished"
+                properties:
+                  hasFinished:
+                    type: boolean
+        "401":
+          description: 권한 없음
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "504":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/accounts/{accountId}:
+    get:
+      description: 계좌 정보 조회
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          description: 계좌번호
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 계좌 정보 가져오기 성공!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountPublic"
+        "504":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/remit:
+    post:
+      description: 계좌 송금
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - from
+                - to
+                - msg
+              properties:
+                amount:
+                  type: number
+                  format: int64
+                from:
+                  type: string
+                to:
+                  type: string
+                msg:
+                  type: string
+      responses:
+        "200":
+          description: 송금 성공!
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Accounts"
+        "400":
+          description: 잘못된 형식
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: 인증 실패
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedError"
+        "403":
+          description: 계좌 잔고 부족
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: 존재하지 않는 계좌번호
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+        "504":
+          description: 서버 오류
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    UnauthorizedError:
+      description: Access token is missing or invalid
+      $ref: "#/components/schemas/Error"
+
+    User:
+      type: object
+      required:
+        - name
+        - accounts
+        - 2FA
+      properties:
+        name:
+          type: string
+        accounts:
+          $ref: "#/components/schemas/Accounts"
+        "2FA":
+          type: string
+    Accounts:
+      type: array
+      items:
+        $ref: "#/components/schemas/Account"
+    Account:
+      type: object
+      required:
+        - name
+        - bank
+        - owner
+        - account_number
+        - balance
+      properties:
+        name:
+          type: string
+        bank:
+          description: "
+            은행은 기본적으로 아래의 리스트중 하나를 은행 이름으로 반환합니다.
+
+            - JavaScript
+
+            - TypeScript
+
+            - Python
+
+            - Go
+
+            - Rust
+
+            - Java
+
+            - C
+
+            - Cpp
+
+            - C#
+
+            - Dart
+
+            - Ruby
+            "
+          type: string
+        owner:
+          type: string
+        account_number:
+          type: string
+        balance:
+          type: integer
+          format: int64
+    AccountPublic:
+      type: object
+      required:
+        - name
+        - bank
+        - owner
+        - account_number
+      properties:
+        name:
+          type: string
+        bank:
+          description: "
+            은행은 기본적으로 아래의 리스트중 하나를 은행 이름으로 반환합니다.
+
+            - JavaScript
+
+            - TypeScript
+
+            - Python
+
+            - Go
+
+            - Rust
+
+            - Java
+
+            - C
+
+            - Cpp
+
+            - C#
+
+            - Dart
+
+            - Ruby
+            "
+          type: string
+        owner:
+          type: string
+        account_number:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
