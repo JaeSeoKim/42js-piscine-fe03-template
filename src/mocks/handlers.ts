@@ -95,7 +95,7 @@ export const handlers = [
         throw new UnauthorizedError();
       }
 
-      const tokken = jwt.sign(
+      const token = jwt.sign(
         {
           id: id,
         },
@@ -105,7 +105,7 @@ export const handlers = [
       return res(
         ctx.status(200),
         ctx.json({
-          tokken,
+          token,
         })
       );
     } catch (error) {

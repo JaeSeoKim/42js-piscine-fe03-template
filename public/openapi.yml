@@ -31,9 +31,9 @@ paths:
               schema:
                 type: object
                 required:
-                  - tokken
+                  - token
                 properties:
-                  tokken:
+                  token:
                     type: string
         "401":
           description: 로그인 실패.

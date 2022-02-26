@@ -10,7 +10,7 @@ beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-const newAuthTokken = () =>
+const newAuthToken = () =>
   jwt.sign(
     {
       id: uuid(),
@@ -27,13 +27,13 @@ describe("[POST] /api/login", () => {
   test("200", async () => {
     const {
       status,
-      data: { tokken },
+      data: { token },
     } = await axios.post("/api/login", {
       id: "hello world!",
       password: "hello world!",
     });
     expect(status).toBe(200);
-    jwt.verify(tokken, __MOCK_JWT_KEY);
+    jwt.verify(token, __MOCK_JWT_KEY);
   });
 });
 
@@ -44,7 +44,7 @@ describe("[GET] /api/me", () => {
       data: { message },
     } = await axios.get("/api/me", {
       headers: {
-        Authorization: `Bearer ${"invaild tokken"}`,
+        Authorization: `Bearer ${"invaild token"}`,
       },
     });
 
@@ -55,7 +55,7 @@ describe("[GET] /api/me", () => {
   test("200", async () => {
     const { status, data } = await axios.get("/api/me", {
       headers: {
-        Authorization: `Bearer ${newAuthTokken()}`,
+        Authorization: `Bearer ${newAuthToken()}`,
       },
     });
 
@@ -71,7 +71,7 @@ describe("[GET] /api/me/sync", () => {
       data: { message },
     } = await axios.get("/api/me/sync", {
       headers: {
-        Authorization: `Bearer ${"invaild tokken"}`,
+        Authorization: `Bearer ${"invaild token"}`,
       },
     });
 
@@ -81,7 +81,7 @@ describe("[GET] /api/me/sync", () => {
   test("200", async () => {
     const { status } = await axios.get("/api/me/sync", {
       headers: {
-        Authorization: `Bearer ${newAuthTokken()}`,
+        Authorization: `Bearer ${newAuthToken()}`,
       },
     });
 
@@ -95,7 +95,7 @@ describe("[GET] /api/me/sync/progress", () => {
       data: { message },
     } = await axios.get("/api/me/sync/progress", {
       headers: {
-        Authorization: `Bearer ${"invaild tokken"}`,
+        Authorization: `Bearer ${"invaild token"}`,
       },
     });
 
@@ -108,7 +108,7 @@ describe("[GET] /api/me/sync/progress", () => {
       data: { hasFinished },
     } = await axios.get("/api/me/sync/progress", {
       headers: {
-        Authorization: `Bearer ${newAuthTokken()}`,
+        Authorization: `Bearer ${newAuthToken()}`,
       },
     });
 
@@ -164,7 +164,7 @@ describe("[POST] /api/remit", () => {
       {},
       {
         headers: {
-          Authorization: `Bearer ${newAuthTokken()}`,
+          Authorization: `Bearer ${newAuthToken()}`,
         },
       }
     );
@@ -182,7 +182,7 @@ describe("[POST] /api/remit", () => {
       {},
       {
         headers: {
-          Authorization: `Bearer ${"invaild tokken"}`,
+          Authorization: `Bearer ${"invaild token"}`,
         },
       }
     );
@@ -204,7 +204,7 @@ describe("[POST] /api/remit", () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${newAuthTokken()}`,
+          Authorization: `Bearer ${newAuthToken()}`,
         },
       }
     );
@@ -227,7 +227,7 @@ describe("[POST] /api/remit", () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${newAuthTokken()}`,
+          Authorization: `Bearer ${newAuthToken()}`,
         },
       }
     );
@@ -247,7 +247,7 @@ describe("[POST] /api/remit", () => {
       },
       {
         headers: {
-          Authorization: `Bearer ${newAuthTokken()}`,
+          Authorization: `Bearer ${newAuthToken()}`,
         },
       }
     );
